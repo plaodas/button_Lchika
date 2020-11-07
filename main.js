@@ -37,14 +37,10 @@ async function connect() {
   await gpioPort0.export("out");
   gpioPort2 = gpioAccess.ports.get(2); // タクトスイッチのポート番号
   await gpioPort2.export("in");
-  await readSwitchLoop();
+  gpioPort2.onchange = toggleLed;
 }
 
-async function readSwitchLoop() {
-  for (;;) {
-    var val = await gpioPort2.read(); // Port 2の状態を読み込む
-    val = val === 0 ? 1 : 0; // スイッチは Pull-up なので OFF で 1、LED は OFF で 0 なので反転させる
-    ledOnOff(val);
-    await sleep(100);
-  }
+function toggleLed(val) {
+  // スイッチは Pull-up なので OFF で 1、LED は OFF で 0 と反転させる
+  ledOnOff(val === 0 ? 1 : 0);
 }
